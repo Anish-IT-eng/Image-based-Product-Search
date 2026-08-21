@@ -1,0 +1,47 @@
+
+============================================================
+  VisualFind -- ResNet50 Triplet-Loss Fine-Tuning v2
+  Device: cpu  |  Margin: 0.5  |  Total epochs: 15
+  Labels: brand  |  Mining: batch-hard
+============================================================
+
+Step 1/6  Collecting image paths ...
+          -> 4787 images | 340 brands
+
+Step 2/6  Stratified train/val split ...
+          -> train: 4260 | val: 527
+
+Step 3/6  Building ResNet50 (backbone frozen) ...
+          -> ResNet50 ready, 2048-dim pool embeddings
+
+Step 4/6  Phase 1 -- layer4 only (6 epochs, LR=0.0001) ...
+  Ep  1/6  train_loss=0.5423  val_loss=0.4714  active_triplets=81166  [148s]
+    [SAVED] best val_loss=0.4714
+  Ep  2/6  train_loss=0.5350  val_loss=0.4708  active_triplets=81166  [134s]
+    [SAVED] best val_loss=0.4708
+  Ep  3/6  train_loss=0.5312  val_loss=0.4718  active_triplets=81166  [143s]
+  Ep  4/6  train_loss=0.5276  val_loss=0.4730  active_triplets=81166  [141s]
+  Ep  5/6  train_loss=0.5277  val_loss=0.4728  active_triplets=81166  [136s]
+  Ep  6/6  train_loss=0.5199  val_loss=0.4723  active_triplets=81166  [138s]
+
+Step 5/6  Phase 2 -- layer3+layer4 (6 epochs, LR=5e-05) ...
+  Ep  1/6  train_loss=0.5239  val_loss=0.4720  active_triplets=81166  [169s]
+  Ep  2/6  train_loss=0.5242  val_loss=0.4731  active_triplets=81166  [173s]
+  Ep  3/6  train_loss=0.5213  val_loss=0.4745  active_triplets=81166  [162s]
+  Ep  4/6  train_loss=0.5191  val_loss=0.4741  active_triplets=81166  [163s]
+  Ep  5/6  train_loss=0.5214  val_loss=0.4751  active_triplets=81166  [167s]
+  Ep  6/6  train_loss=0.5154  val_loss=0.4751  active_triplets=81166  [172s]
+
+Step 6/6  Phase 3 -- layer2+layer3+layer4 (3 epochs, LR=1e-05) ...
+  Ep  1/3  train_loss=0.5159  val_loss=0.4747  active_triplets=81166  [191s]
+  Ep  2/3  train_loss=0.5150  val_loss=0.4749  active_triplets=81166  [189s]
+  Ep  3/3  train_loss=0.5134  val_loss=0.4754  active_triplets=81166  [156s]
+
+============================================================
+  Training complete in 39.7 min
+  Best val_loss : 0.4708
+  Model saved   : C:\Users\anish\Desktop\Image-based Product Search\backend\data\best_model.pth
+
+  Next step: python backend/build_index.py
+============================================================
+

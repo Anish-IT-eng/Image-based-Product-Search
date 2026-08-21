@@ -1,0 +1,93 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# docker-compose.yml — VisualFind Full-Stack Orchestration
+# ─────────────────────────────────────────────────────────────────────────────
+# Services:
+#   backend   — FastAPI + ResNet50 + FAISS  (port 8000)
+#   frontend  — Nginx static server         (port 8080)
+#
+# Usage:
+#   docker compose up --build          # first run (builds images)
+#   docker compose up -d               # detached (subsequent runs)
+#   docker compose down                # stop and remove containers
+#   docker compose logs -f backend     # follow backend logs
+#
+# IMPORTANT: Run build_index.py BEFORE starting via docker-compose so that
+#   backend/data/index.faiss and backend/data/catalog.json exist.
+#   These files are mounted as a read-only volume into the backend container.
+#
+#   python backend/build_index.py   ← run this first (once)
+#   python backend/train.py         ← optional: fine-tune for better accuracy
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+
+  # ── FastAPI Backend ─────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: visualfind-backend:latest
+    container_name: visualfind-backend
+    restart: unless-stopped
+
+    environment:
+      API_HOST: "0.0.0.0"
+      API_PORT: "8000"
+      LOG_LEVEL: "${LOG_LEVEL:-info}"
+      MAX_IMAGES: "${MAX_IMAGES:-1600}"
+      EMBEDDING_BATCH_SIZE: "${EMBEDDING_BATCH_SIZE:-16}"
+      # Allow requests from the Nginx frontend container
+      CORS_ORIGINS: "http://localhost:8080,http://frontend:80,http://localhost:3000"
+
+    volumes:
+      # Mount pre-built index + catalog into the container (read-only at runtime)
+      - ./backend/data:/app/data:ro
+      # Mount images directory so the /images/{path} endpoint can serve thumbnails
+      - ./ut-zap50k-images:/app/ut-zap50k-images:ro
+
+    ports:
+      - "8000:8000"
+
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 3
+
+    networks:
+      - visualfind-net
+
+
+  # ── Nginx Frontend ──────────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    image: visualfind-frontend:latest
+    container_name: visualfind-frontend
+    restart: unless-stopped
+
+    ports:
+      - "8080:80"
+
+    depends_on:
+      backend:
+        condition: service_healthy
+
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/health.txt"]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+
+    networks:
+      - visualfind-net
+
+
+# ── Networks ──────────────────────────────────────────────────────────────────
+networks:
+  visualfind-net:
+    driver: bridge

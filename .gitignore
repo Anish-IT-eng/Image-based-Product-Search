@@ -1,0 +1,60 @@
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# ── Virtual environments ──────────────────────────────────────────────────────
+venv/
+.venv/
+env/
+ENV/
+
+# ── Environment files ─────────────────────────────────────────────────────────
+.env
+# Keep .env.example tracked
+!.env.example
+
+# ── Generated data (large binary files) ──────────────────────────────────────
+backend/data/index.faiss
+backend/data/embeddings.npy
+# Keep catalog.json tracked (small, useful for reference)
+# backend/data/catalog.json
+
+# ── Dataset (very large — do not commit) ─────────────────────────────────────
+ut-zap50k-images/
+ut-zap50k-data/
+*.zip
+
+# ── IDE & OS ──────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Testing & coverage ────────────────────────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+*.cover
+
+# ── Logs ─────────────────────────────────────────────────────────────────────
+*.log
+logs/
+
+# ── pip ──────────────────────────────────────────────────────────────────────
+pip.ini
+
+# ── Docker ───────────────────────────────────────────────────────────────────
+docker-compose.override.yml
+.dockerignore
